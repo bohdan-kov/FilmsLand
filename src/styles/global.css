@@ -1,0 +1,11 @@
+body {
+  color: #fff;
+  background-color: black;
+  font-weight: 400;
+}
+
+.page__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
