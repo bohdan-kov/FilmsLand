@@ -7,8 +7,6 @@ const API_HEADERS = {
 };
 
 async function fetchMovies(endpoint) {
-  console.log('start', process.env.VUE_APP_TMDB_KEY);
-  
   try {
     const response = await fetch(`${API_URL}/${endpoint}?language=en-US&page=1`, {
       method: 'GET',

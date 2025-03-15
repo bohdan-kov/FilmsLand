@@ -1,5 +1,5 @@
 <template>
-  <div class="nav__bar-inner py-[10px] flex items-center justify-between">
+  <div class="nav__bar-inner mb-[65px] py-[10px] flex items-center justify-between">
     <img src="@/assets/images/logo.png" alt="Logo">
 
     <nav class="nav__bar-navigation">
