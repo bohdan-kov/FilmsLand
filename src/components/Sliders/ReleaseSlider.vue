@@ -1,10 +1,16 @@
 <template>
   <swiper
+    :modules="modules"
     :slides-per-view="getSlidesPerView"
     :space-between="20"
-    :loop="true"
-    :autoplay="{ delay: 2500, disableOnInteraction: false }"
+    :loop="false"
+    navigation
+    :pagination="{ clickable: true }"
+    :scrollbar="{ draggable: true }"
+    :autoplay="{delay: 3000, disableOnInteraction: false}"
     class="release__slider-inner"
+    @swiper="onSwiper"
+    @slideChange="onSlideChange"
   >
     <swiper-slide v-for="(item, index) in filmsData" :key="index">
       <div class="release__slider-item relative rounded-[10px]">
@@ -18,8 +24,9 @@
           <div class="overflow-hidden text-ellipsis max-h-[45%]">
             {{ item.overview }}
           </div>
-          <div class="release__slider-action absolute bottom-[23px]">
+          <div class="release__slider-action flex gap-[6px] absolute bottom-[23px]">
             <button-info/>
+            <button-like/>
           </div>
         </div>
         <img
@@ -33,28 +40,50 @@
 </template>
 
 <script>
-import buttonInfo from "@/components/UI/buttonInfo"
+import { computed } from "vue";
+
+import buttonInfo from "@/components/UI/buttonInfo";
+import buttonLike from "@/components/UI/buttonLike";
+
+// import Swiper core and required modules
+import { Navigation, Pagination, Scrollbar, Autoplay, A11y } from 'swiper/modules';
+
+// Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from "swiper/vue";
+
+// Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import "swiper/css/autoplay";
 
 export default {
   components: {
     Swiper,
     SwiperSlide,
-    buttonInfo
+    buttonInfo,
+    buttonLike,
   },
   props: {
     filmsData: {
       type: Array,
     },
   },
-  computed: {
-    getSlidesPerView() {
+  setup() {
+    const getSlidesPerView = computed(() => {
       return window.innerWidth > 768 ? 2 : 1;
-    },
+    });
+    const onSwiper = (swiper) => {
+      console.log(swiper);
+    };
+    const onSlideChange = () => {
+      console.log('slide change');
+    };
+    return {
+      getSlidesPerView,
+      onSwiper,
+      onSlideChange,
+      modules: [Navigation, Pagination, Scrollbar, Autoplay, A11y],
+    };
   },
 };
 </script>
