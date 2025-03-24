@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import './styles/index.css'
 import './styles/global.css'
+import './styles/swiper.css'
 import router from "./router";
 
 

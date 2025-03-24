@@ -1,0 +1,11 @@
+.swiper-steps .swiper-pagination-bullet {
+  opacity: .5;
+  background: #053BA3 !important;
+  height: 12px !important;
+  border-radius: 20px;
+  width: 20px;
+}
+.swiper-steps .swiper-pagination-bullet-active {
+  opacity: 1;
+  width: 50px;
+}

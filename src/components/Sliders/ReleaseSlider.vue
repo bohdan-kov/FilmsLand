@@ -4,13 +4,11 @@
     :slides-per-view="getSlidesPerView"
     :space-between="20"
     :loop="false"
-    navigation
-    :pagination="{ clickable: true }"
+    :navigation="{ nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }"
+    :pagination="false"
     :scrollbar="{ draggable: true }"
     :autoplay="{delay: 3000, disableOnInteraction: false}"
-    class="release__slider-inner"
-    @swiper="onSwiper"
-    @slideChange="onSlideChange"
+    class="release__slider-inner mb-[78px]"
   >
     <swiper-slide v-for="(item, index) in filmsData" :key="index">
       <div class="release__slider-item relative rounded-[10px]">
@@ -26,7 +24,7 @@
           </div>
           <div class="release__slider-action flex gap-[6px] absolute bottom-[23px]">
             <button-info/>
-            <button-like/>
+            <button-like class="bg-[#053BA3]"/>
           </div>
         </div>
         <img
@@ -36,6 +34,13 @@
         />
       </div>
     </swiper-slide>
+
+    <div class="swiper-button-next !w-[40px] !h-[40px]">
+      <button-next/>
+    </div>
+    <div class="swiper-button-prev !w-[40px] !h-[40px]">
+      <button-prev/>
+    </div>
   </swiper>
 </template>
 
@@ -44,9 +49,11 @@ import { computed } from "vue";
 
 import buttonInfo from "@/components/UI/buttonInfo";
 import buttonLike from "@/components/UI/buttonLike";
+import buttonPrev from "@/components/UI/buttonPrev";
+import buttonNext from "@/components/UI/buttonNext";
 
 // import Swiper core and required modules
-import { Navigation, Pagination, Scrollbar, Autoplay, A11y } from 'swiper/modules';
+import { Navigation, Scrollbar, Autoplay, A11y } from 'swiper/modules';
 
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from "swiper/vue";
@@ -54,7 +61,6 @@ import { Swiper, SwiperSlide } from "swiper/vue";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
-import "swiper/css/pagination";
 
 export default {
   components: {
@@ -62,6 +68,8 @@ export default {
     SwiperSlide,
     buttonInfo,
     buttonLike,
+    buttonPrev,
+    buttonNext
   },
   props: {
     filmsData: {
@@ -72,17 +80,10 @@ export default {
     const getSlidesPerView = computed(() => {
       return window.innerWidth > 768 ? 2 : 1;
     });
-    const onSwiper = (swiper) => {
-      console.log(swiper);
-    };
-    const onSlideChange = () => {
-      console.log('slide change');
-    };
+
     return {
       getSlidesPerView,
-      onSwiper,
-      onSlideChange,
-      modules: [Navigation, Pagination, Scrollbar, Autoplay, A11y],
+      modules: [Navigation, Scrollbar, Autoplay, A11y],
     };
   },
 };

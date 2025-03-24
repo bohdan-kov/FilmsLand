@@ -9,3 +9,8 @@ body {
   margin: 0 auto;
   padding: 0 15px;
 }
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  display: none;
+}
