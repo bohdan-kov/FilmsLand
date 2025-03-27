@@ -2,88 +2,59 @@
   <div class="home__view-inner page__container">
     <nav-bar />
     <release-slider :filmsData="releaseFilmsData" />
-    <app-slider
+    <app-slider 
       title="The Most Trending Now"
-      :filmsData="trendingFilmsData"
-    />
+      :filmsData="trendingFilmsData" />
     <app-slider
       title="Popular Films"
       :filmsData="popularFilmsData"
     />
-
-
+    <movies-category/>
   </div>
 </template>
 
 <script>
-import NavBar from '@/components/NavBar.vue'
-import ReleaseSlider from '@/components/Sliders/ReleaseSlider.vue';
-import AppSlider from '@/components/Sliders/AppSlider.vue';
-import { getUpcomingMovies, getNowPlayingMovies, getPopularMovies, getTrendingMovies } from '@/services/movieService'
-
+import NavBar from '@/components/sections/NavBar.vue';
+import ReleaseSlider from '@/components/sliders/ReleaseSlider.vue';
+import MoviesCategory from '@/components/sections/MoviesCategory.vue';
+import AppSlider from '@/components/sliders/AppSlider.vue';
+import { getUpcomingMovies, getNowPlayingMovies, getPopularMovies, getTrendingMovies } from '@/services/movieService';
 
 export default {
-  components: { NavBar, ReleaseSlider, AppSlider },
+  components: { NavBar, ReleaseSlider, AppSlider, MoviesCategory },
   data() {
     return {
       releaseFilmsData: [],
       trendingFilmsData: [],
-      popularFilmsData: []
-    }
-  },
-  computed: {
-
+      nowPlayingFilmsData: [],
+      popularFilmsData: [],
+    };
   },
   methods: {
-    async fetchRelease() {
+    async fetchMovies(fetchFunction, targetData, limit, applyFilter = true) {
       try {
-        const response = await getUpcomingMovies();
-        const filmsFiltered = response.filter(item => item.backdrop_path && item.original_title && item.overview && item.release_date)
-
-        this.releaseFilmsData = filmsFiltered.splice(0, 10)
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    async fetchTrending() {
-      try {
-        const response = await getTrendingMovies();
-        const filmsFiltered = response.filter(item => item.backdrop_path && item.original_title && item.overview && item.release_date)
-
-        this.trendingFilmsData = filmsFiltered.splice(0, 15)
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    async fetchNowPlaying() {
-      try {
-        const response = await getNowPlayingMovies();
-        const filmsFiltered = response.filter(item => item.backdrop_path && item.original_title && item.overview && item.release_date)
-
-        this.trendingFilmsData = filmsFiltered.splice(0, 15)
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    async fetchPopular() {
-      try {
-        const response = await getPopularMovies();
-        const filmsFiltered = response.filter(item => item.backdrop_path && item.original_title && item.overview && item.release_date)
-
-        this.popularFilmsData = filmsFiltered.splice(0, 15)
-
-      } catch (error) {
-        console.error(error);
+        const response = await fetchFunction();
         
+        if (!Array.isArray(response)) {
+          throw new Error(`Invalid response for ${targetData}`);
+        }
+        
+        this[targetData] = applyFilter
+          ? response.filter(({ backdrop_path, original_title, overview, release_date }) => 
+              backdrop_path && original_title && overview && release_date).slice(0, limit)
+          : response.slice(0, limit);
+      } catch (error) {
+        console.error(`Error fetching ${targetData}:`, error);
       }
     }
   },
   created() {
-    this.fetchRelease();
-    this.fetchTrending();
-    this.fetchPopular()
-  },
-}
+    this.fetchMovies(getUpcomingMovies, 'releaseFilmsData', 10);
+    this.fetchMovies(getTrendingMovies, 'trendingFilmsData', 15);
+    this.fetchMovies(getNowPlayingMovies, 'nowPlayingFilmsData', 15);
+    this.fetchMovies(getPopularMovies, 'popularFilmsData', 15);
+  }
+};
 </script>
 
 <style lang="scss" scoped></style>
