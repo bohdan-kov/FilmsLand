@@ -10,6 +10,16 @@ module.exports = {
         contrast: ['Righteous', 'sans-serif']
       }
     },
+    animation: {
+      highlight: 'highlight 0.5s ease-in-out',
+    },
+    keyframes: {
+      highlight: {
+        '0%': { transform: 'scaleX(1)' },
+        '50%': { transform: 'scaleX(1.05)' },
+        '100%': { transform: 'scaleX(1)' },
+      },
+    },
   },
   variants: {
     extend: {},

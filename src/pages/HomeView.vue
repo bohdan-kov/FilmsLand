@@ -10,6 +10,12 @@
       :filmsData="popularFilmsData"
     />
     <movies-category/>
+    <app-slider
+      title="Popular TV series"
+      :filmsData="popularSeriesData"
+    />
+
+    <watch-everywhere/>
   </div>
 </template>
 
@@ -17,21 +23,24 @@
 import NavBar from '@/components/sections/NavBar.vue';
 import ReleaseSlider from '@/components/sliders/ReleaseSlider.vue';
 import MoviesCategory from '@/components/sections/MoviesCategory.vue';
+import WatchEverywhere from '@/components/sections/WatchEverywhere.vue';
 import AppSlider from '@/components/sliders/AppSlider.vue';
-import { getUpcomingMovies, getNowPlayingMovies, getPopularMovies, getTrendingMovies } from '@/services/movieService';
+
+
+import { getUpcomingMovies, getPopularMovies, getPopularSeries, getTrendingMovies } from '@/services/movieService'; //getNowPlayingMovies
 
 export default {
-  components: { NavBar, ReleaseSlider, AppSlider, MoviesCategory },
+  components: { NavBar, ReleaseSlider, AppSlider, MoviesCategory, WatchEverywhere  },
   data() {
     return {
       releaseFilmsData: [],
       trendingFilmsData: [],
-      nowPlayingFilmsData: [],
       popularFilmsData: [],
+      popularSeriesData: []
     };
   },
   methods: {
-    async fetchMovies(fetchFunction, targetData, limit, applyFilter = true) {
+    async fetchAPI(fetchFunction, targetData, limit, applyFilter = true) {
       try {
         const response = await fetchFunction();
         
@@ -40,8 +49,8 @@ export default {
         }
         
         this[targetData] = applyFilter
-          ? response.filter(({ backdrop_path, original_title, overview, release_date }) => 
-              backdrop_path && original_title && overview && release_date).slice(0, limit)
+          ? response.filter(({ backdrop_path, original_title, original_name, overview }) => 
+              backdrop_path && (original_title || original_name) && overview).slice(0, limit)
           : response.slice(0, limit);
       } catch (error) {
         console.error(`Error fetching ${targetData}:`, error);
@@ -49,10 +58,10 @@ export default {
     }
   },
   created() {
-    this.fetchMovies(getUpcomingMovies, 'releaseFilmsData', 10);
-    this.fetchMovies(getTrendingMovies, 'trendingFilmsData', 15);
-    this.fetchMovies(getNowPlayingMovies, 'nowPlayingFilmsData', 15);
-    this.fetchMovies(getPopularMovies, 'popularFilmsData', 15);
+    this.fetchAPI(getUpcomingMovies, 'releaseFilmsData', 10);
+    this.fetchAPI(getTrendingMovies, 'trendingFilmsData', 15);
+    this.fetchAPI(getPopularMovies, 'popularFilmsData', 15);
+    this.fetchAPI(getPopularSeries, 'popularSeriesData', 15)
   }
 };
 </script>

@@ -1,7 +1,4 @@
-const API_URL_MOVIES_LISTS = 'https://api.themoviedb.org/3/movie';
-const API_URL_MOVIES_GENRE = 'https://api.themoviedb.org/3/genre';
-const API_URL_TRENDING = 'https://api.themoviedb.org/3/trending';
-const API_URL_DISCOVER = 'https://api.themoviedb.org/3/discover';
+const API_BASE_URL = 'https://api.themoviedb.org/3';
 const API_KEY = process.env.VUE_APP_TMDB_KEY; // Отримуємо ключ з .env
 
 const API_HEADERS = {
@@ -9,89 +6,57 @@ const API_HEADERS = {
   Authorization: `Bearer ${API_KEY}`
 };
 
-async function fetchMovies(endpoint) {
-  try {
-    const response = await fetch(`${API_URL_MOVIES_LISTS}/${endpoint}?language=en-US&page=1`, {
-      method: 'GET',
-      headers: API_HEADERS
-    });
-    const data = await response.json();
-    return data.results;
-  } catch (error) {
-    console.error('Помилка при отриманні фільмів:', error);
-    throw new Error('Не вдалося завантажити фільми');
-  }
-}
-
-async function fetchTrending(endpoint) {
-  try {
-    const response = await fetch(`${API_URL_TRENDING}/${endpoint}/day?language=en-US`, {
-      method: 'GET',
-      headers: API_HEADERS
-    });
-    const data = await response.json();
-    return data.results;
-  } catch (error) {
-    console.error('Помилка при отриманні фільмів:', error);
-    throw new Error('Не вдалося завантажити фільми');
-  }
-}
-
-async function fetchGenreMovies(endpoint) {
-  try {
-    const response = await fetch(`${API_URL_MOVIES_GENRE}/${endpoint}/list?language=en`, {
-      method: 'GET',
-      headers: API_HEADERS
-    });
-    const data = await response.json();
-    return data.genres;
-  } catch (error) {
-    console.error('Помилка при отриманні фільмів:', error);
-    throw new Error('Не вдалося завантажити фільми');
-  }
-}
-
-async function fetchDiscoverMovies(endpoint, genresList) {
-  console.log('test', genresList);
+/**
+ * Універсальна функція для виконання запитів до TMDB API
+ * @param {string} path - Шлях до ресурсу
+ * @param {object} params - Додаткові параметри запиту
+ * @returns {Promise<any>}
+ */
+async function fetchData(path, params = {}) {
+  const url = new URL(`${API_BASE_URL}/${path}`);
   
+  // Додаємо параметри до URL
+  url.search = new URLSearchParams({
+    language: 'en-US',
+    page: 1,
+    ...params
+  });
+
   try {
-    const response = await fetch(`${API_URL_DISCOVER}/${endpoint}?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&with_genres=35`, {
+    const response = await fetch(url, {
       method: 'GET',
       headers: API_HEADERS
     });
-    const data = await response.json();
-    
-    return data.results;
+
+    if (!response.ok) {
+      throw new Error(`Помилка HTTP: ${response.status}`);
+    }
+
+    return await response.json();
   } catch (error) {
-    console.error('Помилка при отриманні фільмів:', error);
-    throw new Error('Не вдалося завантажити фільми');
+    console.error(`Помилка при отриманні даних (${path}):`, error);
+    throw new Error('Не вдалося завантажити дані');
   }
 }
 
-export function getNowPlayingMovies() {
-  return fetchMovies('now_playing');
-}
+// Функції для отримання фільмів
+export const getNowPlayingMovies = () => fetchData('movie/now_playing').then(data => data.results);
+export const getPopularMovies = () => fetchData('movie/popular').then(data => data.results);
+export const getPopularSeries = () => fetchData('tv/popular').then(data => data.results)
+export const getTopRated = () => fetchData('movie/top_rated').then(data => data.results);
+export const getUpcomingMovies = () => fetchData('movie/upcoming').then(data => data.results);
+export const getTrendingMovies = () => fetchData('trending/movie/day').then(data => data.results);
+export const getGenreMovies = () => fetchData('genre/movie/list').then(data => data.genres);
 
-export function getPopularMovies() {
-  return fetchMovies('popular');
-}
-
-export function getTopRated() {
-  return fetchMovies('top_rated');
-}
-
-export function getUpcomingMovies() {
-  return fetchMovies('upcoming');
-}
-
-export function getTrendingMovies() {
-  return fetchTrending('movie')
-}
-
-export function getGenreMovies() {
-  return fetchGenreMovies('movie')
-}
-
-export function getDiscoverMovies(genresList) {
-  return fetchDiscoverMovies('movie', genresList)
-}
+/**
+ * Отримання списку фільмів із додатковими фільтрами
+ * @param {object} filters - Об'єкт із фільтрами
+ * @returns {Promise<any[]>}
+ */
+export const getDiscoverMovies = (filters = {}) => 
+  fetchData('discover/movie', {
+    include_adult: false,
+    include_video: false,
+    sort_by: 'popularity.desc',
+    ...filters
+  }).then(data => data.results);

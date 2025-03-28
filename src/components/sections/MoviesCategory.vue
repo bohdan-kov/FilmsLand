@@ -8,7 +8,7 @@
       </h3>
     </div>
     <div class="category__content flex gap-[45px]">
-      <movies-category-list :genreData="genreListsData" />
+      <movies-category-list :genreData="genreListsData" @changeGenre="changeGenre"/>
       <div class="category__content-box w-[calc(100%-200px)] mt-[45px]">
         <h4 class="category__content-title font-heading text-[25px] mb-[15px]">Action Films</h4>
         <p class="category__content-desc mb-[55px]">
@@ -32,13 +32,15 @@ export default {
   data() {
     return {
       genreListsData: [],
-      genreFilmsData: []
+      genreFilmsData: [],
+      currentGenre: 0,
+      filtersDiscover: {}
     }
   },
   methods: {
-    async fetchMovies(fetchFunction, targetData, limit, applyFilter = true, ) {
+    async fetchMovies(fetchFunction, targetData, limit, applyFilter = true, dataFilter) {
       try {
-        const response = await fetchFunction();
+        const response = await fetchFunction(dataFilter);
         
         if (!Array.isArray(response)) {
           throw new Error(`Invalid response for ${targetData}`);
@@ -51,11 +53,15 @@ export default {
       } catch (error) {
         console.error(`Error fetching ${targetData}:`, error);
       }
+    },
+    changeGenre(index) {
+      this.filtersDiscover = { with_genres: this.genreListsData[index].id };
+      this.fetchMovies(getDiscoverMovies, 'genreFilmsData', 10, false, this.filtersDiscover);
     }
   },
   created() {
     this.fetchMovies(getGenreMovies, 'genreListsData', 7, false);
-    this.fetchMovies(getDiscoverMovies, 'genreFilmsData', 10, false)
+    this.fetchMovies(getDiscoverMovies, 'genreFilmsData', 10, false, this.filtersDiscover);
   },
 };
 </script>
