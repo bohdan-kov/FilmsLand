@@ -1,5 +1,5 @@
 <template>
-  <div class="nav__bar-inner mb-[65px] py-[10px] flex items-center justify-between">
+  <div class="nav__bar-inner mb-[65px] py-[10px] flex items-center justify-between fixed w-full transition-[top] duration-300 ease-in-out z-[1000] max-w-[1500px] mx-auto left-0 right-0 p-[10px] px-[15px] bg-black/50 backdrop-blur-md rounded-[10px]">
     <img src="@/assets/images/logo.png" alt="Logo">
 
     <nav class="nav__bar-navigation">
@@ -8,7 +8,7 @@
           <router-link to="/">Home</router-link>
         </li>
         <li class="nav__bar-item">
-          <router-link to="/popular">Popular Films</router-link>
+          <router-link to="/discover-films">Discover Films</router-link>
         </li>
         <li class="nav__bar-item">Latest Films</li>
         <li class="nav__bar-item">My List</li>

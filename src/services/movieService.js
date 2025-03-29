@@ -40,11 +40,10 @@ async function fetchData(path, params = {}) {
 }
 
 // Функції для отримання фільмів
-export const getNowPlayingMovies = () => fetchData('movie/now_playing').then(data => data.results);
+export const getUpcomingMovies = () => fetchData('movie/upcoming').then(data => data.results);
 export const getPopularMovies = () => fetchData('movie/popular').then(data => data.results);
 export const getPopularSeries = () => fetchData('tv/popular').then(data => data.results)
-export const getTopRated = () => fetchData('movie/top_rated').then(data => data.results);
-export const getUpcomingMovies = () => fetchData('movie/upcoming').then(data => data.results);
+export const getNowPlayingMovies = () => fetchData('movie/now_playing').then(data => data.results);
 export const getTrendingMovies = () => fetchData('trending/movie/day').then(data => data.results);
 export const getGenreMovies = () => fetchData('genre/movie/list').then(data => data.genres);
 

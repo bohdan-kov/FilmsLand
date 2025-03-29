@@ -8,7 +8,7 @@
     :pagination="false"
     :scrollbar="{ draggable: true }"
     :autoplay="{delay: 3000, disableOnInteraction: false}"
-    class="release__slider-inner mb-[78px]"
+    class="release__slider-inner mb-[78px] mt-[20px]"
   >
     <swiper-slide v-for="(item, index) in filmsData" :key="index">
       <div class="release__slider-item relative rounded-[10px]">

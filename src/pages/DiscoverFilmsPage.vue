@@ -1,25 +1,10 @@
 <template>
-  <div class="home__view-inner">
-    <div class="home__view-wrapper pt-[60px]">
+  <div class="discover__films-inner">
+    <div class="discover__films-wrapper pt-[60px]">
       <div class="page__container">
-        <nav-bar :style="{ top: navTop + 'px' }" class="home__view--nav-bar" />
-
-        <release-slider :filmsData="releaseFilmsData" />
-        <app-slider 
-          title="The Most Trending Now"
-          :filmsData="trendingFilmsData" />
-        <app-slider
-          title="Popular Films"
-          :filmsData="popularFilmsData"
-        />
-        <movies-category/>
-        <app-slider
-          title="Popular TV series"
-          :filmsData="popularSeriesData"
-        />
+        <nav-bar :style="{ top: navTop + 'px' }" class="discover__films--nav-bar" />
       </div>
 
-      <watch-everywhere/>
 
       <div class="page__container">
         <home-footer/>
@@ -31,15 +16,11 @@
 <script>
 import { ref, onMounted, onUnmounted } from "vue";
 import NavBar from '@/components/sections/NavBar.vue';
-import ReleaseSlider from '@/components/sliders/ReleaseSlider.vue';
-import MoviesCategory from '@/components/sections/MoviesCategory.vue';
-import WatchEverywhere from '@/components/sections/WatchEverywhere.vue';
 import HomeFooter from '@/components/sections/HomeFooter.vue';
-import AppSlider from '@/components/sliders/AppSlider.vue';
 import { getUpcomingMovies, getPopularMovies, getPopularSeries, getTrendingMovies } from '@/services/movieService';
 
 export default {
-  components: { NavBar, ReleaseSlider, AppSlider, MoviesCategory, WatchEverywhere, HomeFooter },
+  components: { NavBar, HomeFooter },
   setup() {
     const releaseFilmsData = ref([]);
     const trendingFilmsData = ref([]);
@@ -94,4 +75,22 @@ export default {
 </script>
 
 <style scoped>
+.nav-bar {
+  position: fixed;
+  width: 100%;
+  transition: top 0.3s ease-in-out;
+  z-index: 1000;
+  max-width: 1500px;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+  padding: 10px 15px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+}
+
+.content-wrapper {
+  padding-top: 60px;
+}
 </style>

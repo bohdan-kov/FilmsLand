@@ -2,7 +2,7 @@
   <div>
     <nav>
       <router-link to="/">Home</router-link>
-      <router-link to="/popular">Popular Films</router-link>
+      <router-link to="/discover_movies">Discover Movies</router-link>
     </nav>
     <main>
       <slot/>
