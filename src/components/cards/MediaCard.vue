@@ -17,6 +17,13 @@
       <button-info class="float-right" />
     </div>
     <img
+      v-if="item.poster_path"
+      class="media__card-img w-full h-full object-cover rounded-[10px]"
+      :src="'https://image.tmdb.org/t/p/original' + item.poster_path"
+      alt=""
+    />
+    <img
+      v-else
       class="media__card-img w-full h-full object-cover rounded-[10px]"
       :src="'https://image.tmdb.org/t/p/original' + item.backdrop_path"
       alt=""
@@ -61,7 +68,7 @@ export default {
       return item?.release_date ? item.release_date.split('-')[0] : 'In release';
     },
     ratingRounding(num) {
-      return num.toFixed(1);
+      return num ? num.toFixed(1) : '-';
     }
   },
 };

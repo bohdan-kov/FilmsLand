@@ -12,6 +12,7 @@
     "core-js": "^3.8.3",
     "swiper": "^11.2.5",
     "vue": "^3.2.13",
+    "vue-cal": "^5.0.1-rc.14",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
