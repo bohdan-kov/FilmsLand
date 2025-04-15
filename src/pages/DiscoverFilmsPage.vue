@@ -11,7 +11,7 @@
         <div class="discover__films-box flex gap-[30px]">
           <div class="discover__films-filters min-w-[260px] flex flex-col gap-3">
             <sort-dropdown v-model="discoverFilters.sort_by"/>
-            <filters-dropdown/>
+            <filters-dropdown v-model="discoverFilters"/>
           </div>
           <div class="discover__films-content">
             <media-list-card :mediaDate="discoverFilmsData"/>
@@ -44,6 +44,8 @@ export default {
     const discoverFilters = ref({
       sort_by: 'popularity.desc',
       page: 1,
+      'release_date.gte': '',
+      'release_date.lte': ''
     })
 
     const navTop = ref(0);

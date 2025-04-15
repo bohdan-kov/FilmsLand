@@ -1,7 +1,7 @@
 <template>
   <div class="filters-dropdown__inner">
     <div
-      @click="isOpenFilter = !isOpenFilter"
+      @click="toggleFilter"
       class="filters-dropdown__name justify-between w-full px-[16px] py-[14px] flex items-center rounded-[15px] bg-[#12192C]"
       :class="{ '!rounded-b-[0]': isOpenFilter }"
     >
@@ -9,68 +9,31 @@
       <img
         :class="{ 'rotate-[90deg]': isOpenFilter }"
         src="@/assets/images/icons/arrow-right.svg"
-        alt=""
+        alt="Toggle filter"
       />
     </div>
-    <div
-      v-show="isOpenFilter"
-      class="filters-dropdown__filter px-[16px] py-[14px] rounded-b-[15px] bg-[#1C2331]"
-    >
-      <div class="filters-dropdown__item-date-from flex relative justify-between items-center">
-        from
-        <input
-          v-model="dateStart"
-          type="date"
-          class="filters-dropdown__date-input pr-[30px] bg-black/30 text-white px-3 py-2 rounded-md border-none"
-        />
-        <svg @click="isOpenDateFrom = !isOpenDateFrom" class="absolute right-[10px]" viewBox="0 0 24 24" width="24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-          <g
-            id="SVGRepo_tracerCarrier"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          ></g>
-          <g id="SVGRepo_iconCarrier">
-            <path
-              d="M6.94028 2C7.35614 2 7.69326 2.32421 7.69326 2.72414V4.18487C8.36117 4.17241 9.10983 4.17241 9.95219 4.17241H13.9681C14.8104 4.17241 15.5591 4.17241 16.227 4.18487V2.72414C16.227 2.32421 16.5641 2 16.98 2C17.3958 2 17.733 2.32421 17.733 2.72414V4.24894C19.178 4.36022 20.1267 4.63333 20.8236 5.30359C21.5206 5.97385 21.8046 6.88616 21.9203 8.27586L22 9H2.92456H2V8.27586C2.11571 6.88616 2.3997 5.97385 3.09665 5.30359C3.79361 4.63333 4.74226 4.36022 6.1873 4.24894V2.72414C6.1873 2.32421 6.52442 2 6.94028 2Z"
-              fill="#ffffff"
-            ></path>
-            <path
-              opacity="0.5"
-              d="M21.9995 14.0001V12.0001C21.9995 11.161 21.9963 9.66527 21.9834 9H2.00917C1.99626 9.66527 1.99953 11.161 1.99953 12.0001V14.0001C1.99953 17.7713 1.99953 19.6569 3.1711 20.8285C4.34267 22.0001 6.22829 22.0001 9.99953 22.0001H13.9995C17.7708 22.0001 19.6564 22.0001 20.828 20.8285C21.9995 19.6569 21.9995 17.7713 21.9995 14.0001Z"
-              fill="#ffffff"
-            ></path>
-            <path
-              d="M18 17C18 17.5523 17.5523 18 17 18C16.4477 18 16 17.5523 16 17C16 16.4477 16.4477 16 17 16C17.5523 16 18 16.4477 18 17Z"
-              fill="#ffffff"
-            ></path>
-            <path
-              d="M18 13C18 13.5523 17.5523 14 17 14C16.4477 14 16 13.5523 16 13C16 12.4477 16.4477 12 17 12C17.5523 12 18 12.4477 18 13Z"
-              fill="#ffffff"
-            ></path>
-            <path
-              d="M13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16C12.5523 16 13 16.4477 13 17Z"
-              fill="#ffffff"
-            ></path>
-            <path
-              d="M13 13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13C11 12.4477 11.4477 12 12 12C12.5523 12 13 12.4477 13 13Z"
-              fill="#ffffff"
-            ></path>
-            <path
-              d="M8 17C8 17.5523 7.55228 18 7 18C6.44772 18 6 17.5523 6 17C6 16.4477 6.44772 16 7 16C7.55228 16 8 16.4477 8 17Z"
-              fill="#ffffff"
-            ></path>
-            <path
-              d="M8 13C8 13.5523 7.55228 14 7 14C6.44772 14 6 13.5523 6 13C6 12.4477 6.44772 12 7 12C7.55228 12 8 12.4477 8 13Z"
-              fill="#ffffff"
-            ></path>
-          </g>
-        </svg>
-        <calendar-view 
-          class="absolute right-[-58px] bg-black z-[5] top-[40px]" 
+
+    <div v-show="isOpenFilter" class="filters-dropdown__items py-[14px] rounded-b-[15px] bg-[#1C2331]">
+      <div class="filters-dropdown__item px-[16px] py-[14px] border-y-[2px] border-[#12192C]">
+        <h6 class="filters-dropdown__item-title mb-[10px] font-normal">Release date</h6>
+
+        <DatePicker
+          v-model="localFilters['release_date.gte']"
           @onDateSelected="dateSelected"
-          dateType="from"
-          v-show="isOpenDateFrom" 
+          :isOpenCalendar="isOpenCalendar['release_date.gte']"
+          @openCalendar="toggleCalendar('release_date.gte')"
+          v-click-outside="() => closeCalendar('release_date.gte')"
+          label="from"
+          field="release_date.gte"
+        />
+        <DatePicker
+          v-model="localFilters['release_date.lte']"
+          @onDateSelected="dateSelected"
+          :isOpenCalendar="isOpenCalendar['release_date.lte']"
+          @openCalendar="toggleCalendar('release_date.lte')"
+          v-click-outside="() => closeCalendar('release_date.lte')"
+          label="to"
+          field="release_date.lte"
         />
       </div>
     </div>
@@ -78,28 +41,58 @@
 </template>
 
 <script>
-import calendarView from "../UI/calendarView.vue";
+import clickOutside from "@/directives/v-click-outside.js";
+import DatePicker from './filters/DatePicker.vue';
+
 export default {
-  components: { calendarView },
+  components: { DatePicker },
+  directives: { clickOutside },
+  props: {
+    modelValue: {
+      type: Object,
+      required: true
+    }
+  },
   data() {
     return {
       isOpenFilter: true,
-      isOpenDateFrom: false,
-      dateStart: "2005-12-30",
+      isOpenCalendar: {
+        'release_date.gte': false,
+        'release_date.lte': false
+      },
+      localFilters: JSON.parse(JSON.stringify(this.modelValue)),
     };
   },
-  methods: {
-    dateSelected(date, type){
-      if (type === 'from') this.dateStart = date
+  created() {
+    this.setCurrentDate();
+  },
+  watch: {
+    localFilters: {
+      deep: true,
+      handler(newValue){
+        this.$emit("update:modelValue", newValue)
+      }
     }
   },
+  methods: {
+    toggleFilter() {
+      this.isOpenFilter = !this.isOpenFilter;
+    },
+    toggleCalendar(type) {
+      this.isOpenCalendar[type] = !this.isOpenCalendar[type];
+    },
+    closeCalendar(type) {
+      this.isOpenCalendar[type] = false;
+    },
+    dateSelected(date, type) {
+      this.localFilters[type] = date;
+      this.closeCalendar(type);
+    },
+    setCurrentDate() {
+      const [day, month, year] = new Date().toLocaleDateString().split('.');
+      const formattedDate = `${year}-${month}-${day}`;
+      this.localFilters['release_date.lte'] = formattedDate;
+    }
+  }
 };
 </script>
-
-<style scoped>
-.filters-dropdown__date-input::-webkit-calendar-picker-indicator {
-  opacity: 0;
-  display: none;
-  -webkit-appearance: none;
-}
-</style>
