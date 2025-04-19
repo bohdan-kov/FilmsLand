@@ -9,14 +9,33 @@
         <button @click="fetchDiscoverMovies">Fetch</button>
 
         <div class="discover__films-box flex gap-[30px]">
-          <div class="discover__films-filters min-w-[260px] flex flex-col gap-3">
+          <div class="discover__films-filters min-w-[260px] max-w-[260px] flex flex-col gap-3">
             <sort-dropdown v-model="discoverFilters.sort_by"/>
-            <filters-dropdown v-model="discoverFilters"/>
+            <filters-dropdown v-model="discoverFilters" :genreListsData="genreListsData"/>
           </div>
           <div class="discover__films-content">
             <media-list-card :mediaDate="discoverFilmsData"/>
           </div>
         </div>
+
+        <div class="pagination mt-8 flex justify-center items-center gap-4">
+        <button
+          class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+          :disabled="discoverFilters.page === 1"
+          @click="changePage(discoverFilters.page - 1)"
+        >
+          Prev
+        </button>
+
+        <span class="text-lg">Page {{ discoverFilters.page }}</span>
+
+        <button
+          class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+          @click="changePage(discoverFilters.page + 1)"
+        >
+          Next
+        </button>
+      </div>
 
       </div>
 
@@ -29,9 +48,11 @@
 
 <script>
 import { ref, onMounted, onUnmounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
 import NavBar from '@/components/sections/NavBar.vue';
 import HomeFooter from '@/components/sections/HomeFooter.vue';
-import { getDiscoverMovies } from '@/services/movieService';
+import { getGenreMovies, getDiscoverMovies } from '@/services/movieService';
 import SortDropdown from '@/components/filter-panel/SortDropdown.vue';
 import FiltersDropdown from '@/components/filter-panel/FiltersDropdown.vue';
 import MediaListCard from '@/components/cards/MediaListCard.vue';
@@ -40,12 +61,22 @@ import MediaListCard from '@/components/cards/MediaListCard.vue';
 export default {
   components: { NavBar, HomeFooter, SortDropdown, FiltersDropdown, MediaListCard, },
   setup() {
+    const router = useRouter();
+    const route = useRoute();
+
     const discoverFilmsData = ref([]);
+    const genreListsData = ref([]);
+    const pageCache = ref(new Map());
+
     const discoverFilters = ref({
       sort_by: 'popularity.desc',
-      page: 1,
+      page: parseInt(route.query.page) || 1,
       'release_date.gte': '',
-      'release_date.lte': ''
+      'release_date.lte': '',
+      'with_genres': '',
+      'vote_average.gte': '',
+      'vote_average.lte': '',
+      'vote_count.gte': '',
     })
 
     const navTop = ref(0);
@@ -66,21 +97,21 @@ export default {
 
     onMounted(() => {
       window.addEventListener("scroll", handleScroll);
-      fetchDiscoverMovies()
+      fetchDiscoverMovies();
+      fetchGenreMovies()
     });
 
     onUnmounted(() => {
       window.removeEventListener("scroll", handleScroll);
     });
 
-    watch(
-      () => discoverFilters.value,
-      (newValue, oldValue) => {
-        console.log("Filters changed:", newValue, oldValue);
-        fetchDiscoverMovies();
-      },
-      {deep: true}
-    );
+    watch(() => discoverFilters.value.page, (newPage) => {
+      router.push({ path: '/discover-films', query: { ...route.query, page: newPage } });
+    });
+
+    watch(discoverFilters, () => {
+      fetchDiscoverMovies();
+    }, { deep: true });
 
     const fetchAPI = async (fetchFunction, targetData, limit, applyFilter = true, dataFilter) => {
       try {
@@ -98,12 +129,43 @@ export default {
       }
     };
 
-    const fetchDiscoverMovies = () => {
-      fetchAPI(getDiscoverMovies, discoverFilmsData, 20, true, discoverFilters.value);
+    const fetchDiscoverMovies = async () => {
+      const cacheKey = JSON.stringify(discoverFilters.value);
+      if (pageCache.value.has(cacheKey)) {
+        discoverFilmsData.value = pageCache.value.get(cacheKey);
+        return;
+      }
+
+      const response = await getDiscoverMovies(discoverFilters.value);
+      if (Array.isArray(response)) {
+        const filtered = response.filter(({ backdrop_path, poster_path }) => backdrop_path || poster_path).slice(0, 20);
+        discoverFilmsData.value = filtered;
+        pageCache.value.set(cacheKey, filtered);
+      }
+    };
+
+    const fetchGenreMovies = () => {
+      fetchAPI(getGenreMovies, genreListsData, -1, false);
     }
 
+    const changePage = (newPage) => {
+      if (newPage !== discoverFilters.value.page) {
+        discoverFilters.value.page = newPage;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
 
-    return { getDiscoverMovies, discoverFilmsData, discoverFilters, fetchDiscoverMovies, navTop };
+    return { 
+      getDiscoverMovies, 
+      discoverFilmsData,
+      getGenreMovies, 
+      genreListsData, 
+      discoverFilters, 
+      fetchDiscoverMovies, 
+      fetchGenreMovies, 
+      navTop,
+      changePage
+    };
   }
 };
 </script>

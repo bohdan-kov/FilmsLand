@@ -7,6 +7,12 @@
     >
       <media-card :item="media"/>
     </div>
+    <div 
+      class="media-listCard__no-data pt-[10px]"
+      v-if="!mediaDate.length"
+    >
+    Nothing was found for your search.
+    </div>
   </div>
 </template>
 

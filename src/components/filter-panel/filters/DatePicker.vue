@@ -1,6 +1,6 @@
 <template>
   <div
-    class="filters-dropdown__item-date-from flex relative justify-between items-center font-extralight mb-[8px]"
+    class="filters-dropdown__item-date flex relative justify-between items-center font-extralight mb-[8px]"
   >
     {{ label }}
     <input

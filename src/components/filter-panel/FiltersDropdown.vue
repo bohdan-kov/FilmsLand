@@ -14,9 +14,8 @@
     </div>
 
     <div v-show="isOpenFilter" class="filters-dropdown__items py-[14px] rounded-b-[15px] bg-[#1C2331]">
-      <div class="filters-dropdown__item px-[16px] py-[14px] border-y-[2px] border-[#12192C]">
+      <div class="filters-dropdown__item px-[16px] py-[14px] border-b-[2px] border-[#12192C]">
         <h6 class="filters-dropdown__item-title mb-[10px] font-normal">Release date</h6>
-
         <DatePicker
           v-model="localFilters['release_date.gte']"
           @onDateSelected="dateSelected"
@@ -36,6 +35,30 @@
           field="release_date.lte"
         />
       </div>
+      <div class="filters-dropdown__item px-[16px] py-[14px] border-b-[2px] border-[#12192C]">
+        <h6 class="filters-dropdown__item-title mb-[10px] font-normal">Genre</h6>
+        <GenrePicker 
+          v-model="localFilters['with_genres']"
+          :genreLists="genreListsData"
+          @onGenreSelected="genreSelected"
+        />
+      </div>
+      <div class="filters-dropdown__item px-[16px] py-[14px] border-b-[2px] border-[#12192C]">
+        <h6 class="filters-dropdown__item-title mb-[10px] font-normal">Movie rating</h6>
+        <RangePicker
+          @onRangeSelected="ratingSelected"
+          :rangeValues="ratingRange"
+        />
+      </div>
+      <div class="filters-dropdown__item px-[16px] py-[14px] border-b-[2px] border-[#12192C]">
+        <h6 class="filters-dropdown__item-title mb-[10px] font-normal">Minimum number of votes</h6>
+        <RangePicker
+          @onRangeSelected="votesSelected"
+          :rangeValues="votesRange"
+          :maxValue="500"
+          :intervalValue="100"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -43,14 +66,19 @@
 <script>
 import clickOutside from "@/directives/v-click-outside.js";
 import DatePicker from './filters/DatePicker.vue';
+import GenrePicker from "./filters/GenrePicker.vue";
+import RangePicker from "./filters/RangePicker.vue";
 
 export default {
-  components: { DatePicker },
+  components: { DatePicker, GenrePicker, RangePicker },
   directives: { clickOutside },
   props: {
     modelValue: {
       type: Object,
       required: true
+    },
+    genreListsData: {
+      type: Array,
     }
   },
   data() {
@@ -60,6 +88,8 @@ export default {
         'release_date.gte': false,
         'release_date.lte': false
       },
+      ratingRange: [0, 10],
+      votesRange: [0],
       localFilters: JSON.parse(JSON.stringify(this.modelValue)),
     };
   },
@@ -92,6 +122,30 @@ export default {
       const [day, month, year] = new Date().toLocaleDateString().split('.');
       const formattedDate = `${year}-${month}-${day}`;
       this.localFilters['release_date.lte'] = formattedDate;
+    },
+    genreSelected(id) {
+      const current = this.localFilters['with_genres'];
+      const idStr = String(id);
+      const genreArray = current ? current.split(',') : [];
+
+      if (genreArray.includes(idStr)) {
+        this.localFilters['with_genres'] = genreArray
+          .filter(item => item !== idStr)
+          .join(',');
+      } else {
+        genreArray.push(idStr);
+        this.localFilters['with_genres'] = genreArray.join(',');
+      }
+    },
+    ratingSelected(ratingValue, typeValue){
+      if (typeValue === 0){
+        this.localFilters['vote_average.gte'] = ratingValue[0] 
+      } else {
+        this.localFilters['vote_average.lte'] = ratingValue[1] 
+      }      
+    },
+    votesSelected(votesValue){
+      this.localFilters['vote_count.gte'] = votesValue
     }
   }
 };
