@@ -40,7 +40,9 @@ export default {
   methods: {
     async fetchMovies(fetchFunction, targetData, limit, applyFilter = true, dataFilter) {
       try {
-        const response = await fetchFunction(dataFilter);
+        let response = await fetchFunction(dataFilter);
+
+        response = Array.isArray(response?.response) ? response.response : response;
         
         if (!Array.isArray(response)) {
           throw new Error(`Invalid response for ${targetData}`);

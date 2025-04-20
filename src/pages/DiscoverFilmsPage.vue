@@ -5,36 +5,29 @@
         <nav-bar :style="{ top: navTop + 'px' }" class="discover__films--nav-bar" />
 
         <h2 class="mt-[50px] text-3xl mb-[20px] font-heading inline-block pr-11 relative before:content-[url('@/assets/images/icons/title.svg')] before:absolute before:right-0 before:-top-[10px]">Discover Films</h2>
-        {{ discoverFilters }}
-        <button @click="fetchDiscoverMovies">Fetch</button>
+        <!-- {{ discoverFilters }} {{ totalPages }} -->
+        <!-- <button @click="fetchDiscoverMovies">Fetch</button> -->
 
         <div class="discover__films-box flex gap-[30px]">
           <div class="discover__films-filters min-w-[260px] max-w-[260px] flex flex-col gap-3">
             <sort-dropdown v-model="discoverFilters.sort_by"/>
             <filters-dropdown v-model="discoverFilters" :genreListsData="genreListsData"/>
           </div>
-          <div class="discover__films-content">
-            <media-list-card :mediaDate="discoverFilmsData"/>
+          <div class="discover__films-content relative w-full">
+            <media-list-card v-if="!pageLoading" :mediaDate="discoverFilmsData"/>
+            <svg v-else class="discover__films-content--loading absolute left-0 right-0 top-[50%] transform -translate-y-1/2 my-0 mx-auto" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="50" height="50" style="shape-rendering: auto; display: block; background: transparent;"><g><circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10" stroke="#053ba9" fill="none" cy="50" cx="50">
+  <animateTransform keyTimes="0;1" values="0 50 50;360 50 50" dur="1.3333333333333333s" repeatCount="indefinite" type="rotate" attributeName="transform"/>
+</circle><g/></g></svg>
           </div>
         </div>
 
         <div class="pagination mt-8 flex justify-center items-center gap-4">
-        <button
-          class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-          :disabled="discoverFilters.page === 1"
-          @click="changePage(discoverFilters.page - 1)"
-        >
-          Prev
-        </button>
-
-        <span class="text-lg">Page {{ discoverFilters.page }}</span>
-
-        <button
-          class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-          @click="changePage(discoverFilters.page + 1)"
-        >
-          Next
-        </button>
+        
+        <pagination-nav
+          :totalPages="totalPages"
+          :currentPage="discoverFilters.page"
+          @onChangePage="onChangePage"
+        />
       </div>
 
       </div>
@@ -56,17 +49,21 @@ import { getGenreMovies, getDiscoverMovies } from '@/services/movieService';
 import SortDropdown from '@/components/filter-panel/SortDropdown.vue';
 import FiltersDropdown from '@/components/filter-panel/FiltersDropdown.vue';
 import MediaListCard from '@/components/cards/MediaListCard.vue';
+import PaginationNav from '@/components/UI/paginationNav.vue';
 
 
 export default {
-  components: { NavBar, HomeFooter, SortDropdown, FiltersDropdown, MediaListCard, },
+  components: { NavBar, HomeFooter, SortDropdown, FiltersDropdown, MediaListCard, PaginationNav, },
   setup() {
     const router = useRouter();
     const route = useRoute();
 
     const discoverFilmsData = ref([]);
     const genreListsData = ref([]);
+    const pageLoading = ref(true)
+
     const pageCache = ref(new Map());
+    const totalPages = ref(1);
 
     const discoverFilters = ref({
       sort_by: 'popularity.desc',
@@ -97,7 +94,7 @@ export default {
 
     onMounted(() => {
       window.addEventListener("scroll", handleScroll);
-      fetchDiscoverMovies();
+      // fetchDiscoverMovies();
       fetchGenreMovies()
     });
 
@@ -136,11 +133,15 @@ export default {
         return;
       }
 
-      const response = await getDiscoverMovies(discoverFilters.value);
+      const {response, total_pages} = await getDiscoverMovies(discoverFilters.value);
+      
+      totalPages.value = total_pages < 500 ? total_pages : 500
+
       if (Array.isArray(response)) {
         const filtered = response.filter(({ backdrop_path, poster_path }) => backdrop_path || poster_path).slice(0, 20);
         discoverFilmsData.value = filtered;
         pageCache.value.set(cacheKey, filtered);
+        pageLoading.value = false
       }
     };
 
@@ -148,12 +149,12 @@ export default {
       fetchAPI(getGenreMovies, genreListsData, -1, false);
     }
 
-    const changePage = (newPage) => {
+    const onChangePage = (newPage) => {
       if (newPage !== discoverFilters.value.page) {
         discoverFilters.value.page = newPage;
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
-    };
+    }
 
     return { 
       getDiscoverMovies, 
@@ -164,7 +165,9 @@ export default {
       fetchDiscoverMovies, 
       fetchGenreMovies, 
       navTop,
-      changePage
+      totalPages,
+      onChangePage,
+      pageLoading
     };
   }
 };

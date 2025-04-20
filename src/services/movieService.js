@@ -58,4 +58,7 @@ export const getDiscoverMovies = (filters = {}) =>
     include_video: false,
     sort_by: 'popularity.desc',
     ...filters
-  }).then(data => data.results);
+  }).then(data => ({
+    response: data.results,
+    total_pages: data.total_pages
+  }));
