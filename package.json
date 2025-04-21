@@ -14,7 +14,8 @@
     "vue": "^3.2.13",
     "vue-3-slider-component": "^1.0.2",
     "vue-cal": "^5.0.1-rc.14",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "vue-star-rating": "^2.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

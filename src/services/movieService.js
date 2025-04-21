@@ -62,3 +62,11 @@ export const getDiscoverMovies = (filters = {}) =>
     response: data.results,
     total_pages: data.total_pages
   }));
+
+/**
+ * Отримайте найвищий рівень деталей фільму за ідентифікатором.
+ * @param {object} movie_id - Число з ідентифікатором фільму
+ * @returns {Promise<any[]>}
+ */
+export const getDetailsMovies = (movie_id) => 
+  fetchData(`movie/${movie_id}`).then(data => data);

@@ -1,6 +1,6 @@
 <template>
-  <div class="watchEverywhere__inner">
-    <div class="watchEverywhere__box page__container flex justify-between items-center ">
+  <div class="watchEverywhere__inner relative">
+    <div class="watchEverywhere__box page__container flex justify-between items-center z-20 relative">
       <div class="watchEverywhere__content max-w-[600px]">
         <h3 class="watchEverywhere__title text-3xl mb-[20px] font-heading inline-block pr-11 relative before:content-[url('@/assets/images/icons/title.svg')] before:absolute before:right-0 before:-top-[10px]">Watch everywhere</h3>
         <p class="watchEverywhere__desc mt-[80px] mb-[60px]">You can find everything related to movies here. Be without limited. You can browse anywhere on your phone, tablet, laptop. You can be flexible. You can also use our app offline.</p>
@@ -10,6 +10,7 @@
         <img src="@/assets/images/watchEveryWhere.png" alt="">
       </div>
     </div>
+    <div class="watchEverywhere__background filter blur-[10px] absolute top-0 left-0 right-0 h-full"/>
   </div>
 </template>
 
@@ -20,7 +21,7 @@
 </script>
 
 <style scoped>
-.watchEverywhere__inner {
+.watchEverywhere__background {
   background: linear-gradient(180deg, rgba(5, 59, 163, 0.00) 0%, #053BA3 100%);
 }
 </style>

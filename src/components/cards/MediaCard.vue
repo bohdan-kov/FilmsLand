@@ -14,7 +14,7 @@
       <div class="media__card-date">
         {{ getYearItem(item) }}
       </div>
-      <button-info class="float-right" />
+      <button-info @click="openMediaDetails(item.id)" class="float-right" />
     </div>
     <img
       v-if="item.poster_path"
@@ -69,6 +69,9 @@ export default {
     },
     ratingRounding(num) {
       return num ? num.toFixed(1) : '-';
+    },
+    openMediaDetails(mediaId){
+      this.$router.push(`/media-details/${mediaId}`)
     }
   },
 };
